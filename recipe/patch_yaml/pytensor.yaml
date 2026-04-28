@@ -64,6 +64,8 @@ then:
 # already-published 2.36.0-2.38.2 records still advertise numba >0.57,<1.
 # That makes the numba constraint non-monotone across PyTensor releases and
 # creates a bogus solver downgrade path once numba 0.65.1 is no longer latest.
+# Keep the historical lower bound unchanged here; the solver issue is caused by
+# the vacuous <1 upper bound becoming non-vacuous after a future numba release.
 if:
   name: pytensor-base
   version_ge: 2.36.0
