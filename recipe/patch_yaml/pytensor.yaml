@@ -58,3 +58,42 @@ then:
   - replace_depends:
       old: numpy >=1.17.0
       new: numpy >=2.0
+---
+# Numba's upper bound is being tightened to <=0.65.1 starting with
+# PyTensor v2.38.3, since older numba releases were the only ones tested
+# against PyTensor and there is no reason to believe newer numba versions
+# will be compatible.
+# See <https://github.com/conda-forge/pytensor-suite-feedstock/pull/209>.
+#
+# Patch 1 of 2: tighten the upper bound on existing pytensor-base v2.36.0
+# through v2.38.2 builds (which all carry `numba >0.57,<1`) to match the new
+# v2.38.3 constraint `numba >=0.58,<=0.65.1`. Without this patch a conda
+# solver could downgrade pytensor in order to upgrade numba past 0.65.1
+# (i.e. to a future numba release once it lands on conda-forge), which is a
+# non-monotone, fake tradeoff: there is nothing about older PyTensor
+# releases that makes them more compatible with newer numba versions.
+if:
+  name: pytensor-base
+  version_ge: 2.36.0
+  version_lt: 2.38.3
+  timestamp_lt: 1777370723000
+  has_depends: numba >0.57,<1
+then:
+  - replace_depends:
+      old: numba >0.57,<1
+      new: numba >=0.58,<=0.65.1
+---
+# Patch 2 of 2: pytensor-base versions before v2.36.0 do not depend on
+# numba at all, but pytensor was/is usable with numba via its numba
+# backend. To keep the numba upper bound monotone across the entire
+# pytensor-base history (and avoid the same fake-tradeoff downgrade
+# scenario described above), add a run-constraint of `numba <=0.65.1`
+# to all pre-v2.36.0 builds. This does not force numba to be installed;
+# it only constrains numba's version when it is co-installed alongside
+# an older pytensor-base.
+if:
+  name: pytensor-base
+  version_lt: 2.36.0
+  timestamp_lt: 1777370723000
+then:
+  - add_constrains: numba <=0.65.1
