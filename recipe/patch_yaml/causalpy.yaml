@@ -1,0 +1,12 @@
+# causalpy 0.8.1 added an upper bound of `arviz <0.24.0` in conda-forge.
+# Back-apply that bound to earlier releases so old causalpy records do not
+# solve with newer ArviZ releases outside the tested API range.
+if:
+  name: causalpy
+  version_lt: '0.8.1'
+  timestamp_lt: 1779463370000
+  has_depends: arviz?( *)
+then:
+  - tighten_depends:
+      name: arviz
+      upper_bound: '0.24.0'

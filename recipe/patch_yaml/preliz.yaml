@@ -1,0 +1,12 @@
+# preliz 0.20.0 migrated from the monolithic `arviz` package to
+# `arviz-stats`. Older preliz releases still depend directly on pre-1.0
+# ArviZ APIs, so keep those records from solving with ArviZ >=1.0.
+if:
+  name: preliz
+  version_le: '0.9.1'
+  timestamp_lt: 1779463370000
+  has_depends: arviz?( *)
+then:
+  - tighten_depends:
+      name: arviz
+      upper_bound: '1.0'
