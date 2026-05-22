@@ -48,3 +48,35 @@ then:
   - replace_depends:
       old: pytensor-base >=2.31.2,<2.32
       new: pytensor-base >=2.31.7,<2.32
+
+---
+
+# PyMC 5.28.1 added the upstream bound `arviz >=0.13.0,<1.0`
+# before PyMC 6 moved to `arviz >=1.1.0,<2.0`. Back-apply the
+# bound to earlier PyMC 4/5 builds so old PyMC releases do not solve
+# with ArviZ >=1.0.
+if:
+  name: pymc-base
+  version_ge: '4.0.0'
+  version_lt: '5.28.1'
+  timestamp_lt: 1779444890000
+  has_depends: arviz?( *)
+then:
+  - tighten_depends:
+      name: arviz
+      upper_bound: '1.0'
+
+---
+
+# Early PyMC 4 beta and final builds predate the pymc/pymc-base split
+# in conda-forge but have the same ArviZ compatibility boundary.
+if:
+  name: pymc
+  version_ge: '4.0.0b1'
+  version_lt: '4.0.1'
+  timestamp_lt: 1779444890000
+  has_depends: arviz?( *)
+then:
+  - tighten_depends:
+      name: arviz
+      upper_bound: '1.0'
